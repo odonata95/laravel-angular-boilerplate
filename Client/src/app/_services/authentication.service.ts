@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, Response, RequestOptions } from '@angular/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
@@ -7,13 +7,13 @@ import { environment } from '../../environments/environment';
 @Injectable()
 export class AuthenticationService {
     public token: string;
-    private headers: Headers;
+    private headers: HttpHeaders;
     private readonly apiUrl = environment.apiUrl;
     private readonly baseUrl = environment.baseUrl;
 
-    constructor(private http: Http) {
+    constructor(private http: HttpClient) {
         //append headers
-        this.headers = new Headers();
+        this.headers = new HttpHeaders();
         this.headers.append("Content-Type", 'application/json');
         this.headers.append("Access-Control-Allow-Origin", "*");
         this.headers.append("Access-Control-Allow-Headers", "Origin, Authorization, Content-Type, Accept");
@@ -24,14 +24,12 @@ export class AuthenticationService {
     }
 
     login(email: string, password: string): Observable<any> {
-        let request = JSON.stringify({ email: email, password: password });
-        let options = new RequestOptions({ headers: this.headers }); // Create a request option
-        return this.http.post(this.apiUrl+'/login', request, options)
+        return this.http.post(this.apiUrl+'/login', { email: email, password: password }, { headers: this.headers } )
             .pipe(
                 map((response: Response) => {
                     // login successful if there's a jwt token in the response
-                    this.token = response.json().token;
-                    let email = response.json().email;
+                    this.token = response['token'];
+                    let email = response['email'];
                     if (this.token) {
                         // store email and jwt token in local storage to keep user logged in between page refreshes
                         localStorage.setItem('user', 
@@ -43,14 +41,13 @@ export class AuthenticationService {
     }
 
     register(username: string, email: string, password: string): Observable<any> {
-        let request = JSON.stringify({ email: email, name: username, password: password });
-        let options = new RequestOptions({ headers: this.headers }); // Create a request option
-        return this.http.post(this.apiUrl+'/register', request, options)
+        return this.http.post(this.apiUrl+'/register', { email: email, name: username, 
+                password: password }, { headers: this.headers } )
             .pipe(
                 map((response: Response) => {
                     // register successful if there's a jwt token in the response
-                    this.token = response.json().token;
-                    let email = response.json().email;
+                    this.token = response['token'];
+                    let email = response['email'];
                     if (this.token) {
                         // store email and jwt token in local storage to keep user logged in between page refreshes
                         localStorage.setItem('user', 
@@ -67,26 +64,23 @@ export class AuthenticationService {
         localStorage.removeItem('user');
     }
 
-    sendPasswordResetEmail(email: string): Observable<boolean>  {
+    sendPasswordResetEmail(email: string): Observable<any>  {
         let url = this.baseUrl+'/reset-password';
-        let request = JSON.stringify({ email: email, url:  url });
-        let options = new RequestOptions({ headers: this.headers });
-        return this.http.post(this.apiUrl+'/password-reset-email', request, options)
+        return this.http.post(this.apiUrl+'/password-reset-email', 
+                { email: email, url:  url }, { headers: this.headers } )
             .pipe(
                 map((response: Response) => {
-                    return response.json();
+                    return response;
                 })
             );
     }
 
-    resetPassword(newPassword: string, confirmedPassword: string, token: string): Observable<boolean> {
-        let request = JSON.stringify({ password: newPassword, 
-          confirm_password: confirmedPassword, token: token });
-        let options = new RequestOptions({ headers: this.headers });
-        return this.http.post(this.apiUrl+'/reset-password', request, options)
+    resetPassword(newPassword: string, confirmedPassword: string, token: string): Observable<any> {
+        return this.http.post(this.apiUrl+'/reset-password', { password: newPassword, 
+                confirm_password: confirmedPassword, token: token }, { headers: this.headers } )
             .pipe(
                 map((response: Response) => {
-                    return response.json();
+                    return response;
                 })
             );
     }

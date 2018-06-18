@@ -23,10 +23,9 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.email, this.password)
     .subscribe(res => {
       //check for errors
-      let err = JSON.parse(res._body);
       this.warningMessage = '';
-      if(Array.isArray(err)) {
-        this.warningMessage += err[0];
+      if(Array.isArray(res)) {
+        this.warningMessage += res[0];
       } 
       // if not errors - navigate to home
       if(!this.warningMessage)
@@ -36,11 +35,5 @@ export class LoginComponent implements OnInit {
       console.error(error);
     } );
   }
-
-  /*
-  refreshToken(time=3000000) {
-    setInterval( () => {this.authService.refreshToken();}, time); 
-  }
-  */
 
 }

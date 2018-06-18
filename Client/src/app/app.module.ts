@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { MatButtonModule, MatIconModule,
   MatCardModule, MatInputModule, MatToolbarModule } from '@angular/material';
 import 'hammerjs';
@@ -31,7 +31,7 @@ import { HomeComponent } from './_components/home/home.component';
     FormsModule,
     ReactiveFormsModule,
     routing,
-    HttpModule,
+    HttpClientModule,
     BrowserAnimationsModule,
     NoopAnimationsModule,
     MatButtonModule, 
